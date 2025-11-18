@@ -160,6 +160,13 @@ abstract class CI_DB_driver {
 	public $conn_id			= FALSE;
 
 	/**
+	 * Failover settings
+	 *
+	 * @var	array
+	 */
+	public $failover		= array();
+
+	/**
 	 * Result ID
 	 *
 	 * @var	object|resource

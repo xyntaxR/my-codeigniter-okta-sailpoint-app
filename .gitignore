@@ -2,9 +2,14 @@
 
 application/cache/*
 !application/cache/index.html
+!application/cache/.htaccess
+!application/cache/sessions
+application/cache/sessions/*
+!application/cache/sessions/.htaccess
 
 application/logs/*
 !application/logs/index.html
+!application/logs/.htaccess
 
 !application/*/.htaccess
 
@@ -21,6 +26,7 @@ user_guide_src/cilexer/pycilexer.egg-info/*
 #-------------------------
 /nbproject/
 .idea/*
+.vscode/
 
 ## Sublime Text cache files
 *.tmlanguage.cache
@@ -30,3 +36,26 @@ user_guide_src/cilexer/pycilexer.egg-info/*
 *.sublime-project
 /tests/tests/
 /tests/results/
+
+# Okta Integration - Sensitive Files
+#-------------------------
+.env
+create_admin.php
+
+# Optional: Uncomment to exclude sensitive config files
+# application/config/okta.php
+# application/config/database.php
+
+# Security files
+*.pem
+*.key
+*.crt
+*.cert
+id_rsa*
+*.ppk
+
+# OS Files
+Thumbs.db
+*.swp
+*.swo
+*~

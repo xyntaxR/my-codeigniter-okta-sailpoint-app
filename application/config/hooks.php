@@ -11,3 +11,11 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 |	https://codeigniter.com/userguide3/general/hooks.html
 |
 */
+
+// Authentication check hook - runs before controller execution
+$hook['post_controller_constructor'] = array(
+    'class'    => 'Auth_filter',
+    'function' => 'check_authentication',
+    'filename' => 'Auth_filter.php',
+    'filepath' => 'hooks'
+);

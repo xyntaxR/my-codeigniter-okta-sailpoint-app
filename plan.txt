@@ -1,0 +1,21 @@
+• Design and implementation of required changes to support integration with Okta. The integration will implement a custom servlet filter using Okta's JWT Verifier library (com.okta.jwt:okta-jwt-verifier) within the AAA SM application to implement and manage the OIDC-based authentication flow with Okta.
+• Configuration of authentication flows as applicable.
+• Development and customization of AAA SM application components to enable Okta-based login.
+
+Implementing authentication via Okta using the OpenID Connect (OIDC) protocol for the GUI
+Maintaining local user authentication in the internal database for fallback and administrative access.
+Managing Okta connectivity, user mapping, and role synchronization.
+Providing a consistent session-based login experience post-authentication.
+Mapping 3 roles from GUI to CBC roles Primary Flow - Okta Login
+1. User login on the application login page
+2. Security Server check the user - if defined internally it will authenticate the user as today, if user is unknown to the Security server and External Security is defined in the system the user will be redirect to the Okta Server.
+3. The app redirects to Okta’s hosted login page.
+4. Okta handles user authentication (username/password + 2FA if enabled).
+5. Okta issues an ID token and access token back to the application.
+6. The app validates the token, creates a local session, and stores user details (if not already cached).
+7. Security server will save the user as an external user with the authorization given in Okta system
+
+Fallback Flow – Local Login
+1. User selects Login on the login page.
+2. Credentials are validated against the local database
+3. On success, a local session token is generated.
