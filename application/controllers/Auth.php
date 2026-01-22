@@ -11,6 +11,7 @@ class Auth extends CI_Controller {
     public function __construct() {
         parent::__construct();
         $this->load->library('okta_service');
+        $this->load->library('sailpoint_service');
         $this->load->library('role_mapper');
         $this->load->model('user_model');
         $this->load->helper('form');
@@ -103,11 +104,14 @@ class Auth extends CI_Controller {
         $full_name = $user_info->name ?? '';
         $external_id = $user_info->sub;
         
-        // Extract and map groups to roles
-        $groups = $this->okta_service->extract_groups($user_info);
-        $roles = $this->role_mapper->map_groups_to_roles($groups);
+        // Get roles directly from user_info groups, excluding 'Everyone'
+        $groups = $user_info->groups ?? [];
+        $roles = array_filter($groups, function($group) {
+            return $group !== 'Everyone';
+        });
+        $roles = array_values($roles); // Re-index array after filtering
         
-        // Create or update user in database
+        // Prepare base user data
         $user_data = array(
             'username' => $username,
             'email' => $email,
@@ -116,6 +120,18 @@ class Auth extends CI_Controller {
             'roles' => $roles
         );
         
+        // Sync additional data from SailPoint if enabled
+        if ($this->config->item('sailpoint_enabled')) {
+            log_message('info', 'Syncing user data from SailPoint for: ' . $email);
+            $user_data = $this->sailpoint_service->sync_user_from_sailpoint($email, $user_data);
+            
+            // SailPoint roles override Okta roles if found
+            if (isset($user_data['roles'])) {
+                log_message('info', 'Using SailPoint role for user: ' . $user_data['roles']);
+            }
+        }
+        
+        // Create or update user in database
         $user_id = $this->user_model->create_or_update_external_user($user_data);
         
         if (!$user_id) {
@@ -138,7 +154,7 @@ class Auth extends CI_Controller {
         log_message('info', 'Retrieved user data for: ' . $username . ' (ID: ' . $user_id . ')');
         
         // Create session
-        $this->create_session($user, $tokens);
+        $this->create_session($user, $tokens, 'okta');
         
         // Clear Okta state and nonce
         $this->session->unset_userdata('okta_state');
@@ -200,7 +216,7 @@ class Auth extends CI_Controller {
      * @param object $user
      * @param array $tokens Optional Okta tokens
      */
-    private function create_session($user, $tokens = null) {
+    private function create_session($user, $tokens = null, $provider = 'local') {
         $session_data = array(
             'user_id' => $user->id,
             'username' => $user->username,
@@ -209,6 +225,7 @@ class Auth extends CI_Controller {
             'user_type' => $user->user_type,
             'roles' => $user->roles,
             'primary_role' => $this->role_mapper->get_primary_role($user->roles),
+            'auth_provider' => $provider,
             'logged_in' => TRUE,
             'login_time' => time()
         );
@@ -238,22 +255,24 @@ class Auth extends CI_Controller {
      */
     public function logout() {
         $user_type = $this->session->userdata('user_type');
+        $auth_provider = $this->session->userdata('auth_provider');
         $id_token = $this->session->userdata('id_token');
         
         // Destroy session
         $this->session->sess_destroy();
         
-        // If external user, redirect to Okta logout
-        if ($user_type === 'external' && $id_token && $this->config->item('okta_enabled')) {
+        // If external user authenticated via Okta, redirect to Okta logout
+        if ($user_type === 'external' && $auth_provider === 'okta' && $id_token && $this->config->item('okta_enabled')) {
             $logout_url = $this->okta_service->get_logout_url($id_token);
             redirect($logout_url);
-        } else {
-            // Local logout
-            $this->session->set_flashdata('success', 'You have been logged out successfully.');
-            redirect('auth/login');
         }
+        
+        // Local logout
+        $this->session->set_flashdata('success', 'You have been logged out successfully.');
+        redirect('auth/login');
     }
     
+
     /**
      * Access denied page
      */

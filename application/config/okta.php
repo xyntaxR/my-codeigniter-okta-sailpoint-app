@@ -11,22 +11,22 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 */
 
 // Okta Domain (e.g., dev-12345.okta.com)
-$config['okta_domain'] = getenv('OKTA_DOMAIN') ?: 'integrator-4569280.okta.com';
+$config['okta_domain'] = $_ENV['OKTA_DOMAIN'];
 
 // Okta Client ID
-$config['okta_client_id'] = getenv('OKTA_CLIENT_ID') ?: '0oaxisl7lmsKan8co697';
+$config['okta_client_id'] = $_ENV['OKTA_CLIENT_ID'];
 
 // Okta Client Secret
-$config['okta_client_secret'] = getenv('OKTA_CLIENT_SECRET') ?: '_rGyxNtu6l597DQheE5lc4vQdSe4CCB4FoFsoLpIKePrgv44GbY8LHlGQ8ZKEhHQ';
+$config['okta_client_secret'] = $_ENV['OKTA_CLIENT_SECRET'];
 
 // Okta Authorization Server ID (use 'default' for the default authorization server)
-$config['okta_auth_server_id'] = getenv('OKTA_AUTH_SERVER_ID') ?: 'default';
+$config['okta_auth_server_id'] = $_ENV['OKTA_AUTH_SERVER_ID'];
 
 // Redirect URI after authentication
-$config['okta_redirect_uri'] = getenv('OKTA_REDIRECT_URI') ?: 'http://localhost/my-codeigniter-okta-app/index.php/auth/callback';
+$config['okta_redirect_uri'] = $_ENV['OKTA_REDIRECT_URI'];
 
 // Post logout redirect URI (where to redirect after logout)
-$config['okta_post_logout_redirect_uri'] = getenv('OKTA_POST_LOGOUT_REDIRECT_URI') ?: 'http://localhost/my-codeigniter-okta-app/';
+$config['okta_post_logout_redirect_uri'] = $_ENV['OKTA_POST_LOGOUT_REDIRECT_URI'];
 
 // Scopes to request
 $config['okta_scopes'] = array('openid', 'profile', 'email');

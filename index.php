@@ -38,6 +38,21 @@
 
 /*
  *---------------------------------------------------------------
+ * LOAD ENVIRONMENT VARIABLES
+ *---------------------------------------------------------------
+ *
+ * Load environment variables from .env file using phpdotenv library.
+ * This allows secure configuration management without hardcoding values.
+ */
+require_once __DIR__ . '/vendor/autoload.php';
+
+if (file_exists(__DIR__ . '/.env')) {
+	$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
+	$dotenv->load();
+}
+
+/*
+ *---------------------------------------------------------------
  * APPLICATION ENVIRONMENT
  *---------------------------------------------------------------
  *

@@ -65,10 +65,6 @@
             color: #3c3;
         }
         
-        .okta-login-section {
-            margin-bottom: 30px;
-        }
-        
         .btn {
             display: block;
             width: 100%;
@@ -99,6 +95,10 @@
         
         .btn-local:hover {
             background-color: #5568d3;
+        }
+        
+        .external-login-section {
+            margin-bottom: 30px;
         }
         
         .divider {
